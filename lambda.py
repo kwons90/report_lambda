@@ -192,7 +192,7 @@ def generateReport():
     pdf.set_font('arial', 'B', 12)
     pdf.cell(0, 10, "Hi! " +student_name +" has just solved", 0, 1, "C")
     pdf.set_font("arial", '', 12)
-    pdf.cell(0, 7, str(session_questions)+' problems in' + str(session_minutes) +' minutes', 0, 1, "C")
+    pdf.cell(0, 7, str(session_questions)+' problems in ' + str(session_minutes) +' minutes', 0, 1, "C")
     pdf.ln(3)
     
     
