@@ -1,0 +1,89 @@
+{
+    "course":"Yr 8 Math",
+    "parent_name":"",
+    "student_name":"Allegra",
+    "progress":48,
+    "report_date":"2023-08-30",
+    "join_date":"2023-03-06",
+    "total_questions":684,
+    "student_id":91198,
+    "session_questions":1,
+    "session_minutes":0.0,
+    "session_data":
+    [
+        {"accuracy":1,
+         "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+         "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        },
+        {"accuracy":1,
+        "image":"https://prepanywhere.s3.amazonaws.com/live-classrooms/students/91198/91093/1/submit"
+        }
+    ],
+    
+    "sessions":
+    [
+        {"date":"07-27  3:36 PM","correct_session":0,"incorrect_session":0,"correct_nosession":0,"incorrect_nosession":1},
+        {"date":"07-29  9:44 AM","correct_session":0,"incorrect_session":0,"correct_nosession":6,"incorrect_nosession":2},
+        {"date":"07-30  8:00 AM","correct_session":0,"incorrect_session":0,"correct_nosession":0,"incorrect_nosession":1},
+        {"date":"08-01 10:10 AM","correct_session":7,"incorrect_session":2,"correct_nosession":0,"incorrect_nosession":0},
+        {"date":"08-02 10:12 AM","correct_session":5,"incorrect_session":3,"correct_nosession":0,"incorrect_nosession":0},
+        {"date":"08-03 10:45 AM","correct_session":2,"incorrect_session":2,"correct_nosession":0,"incorrect_nosession":0},
+        {"date":"08-11  6:36 AM","correct_session":3,"incorrect_session":2,"correct_nosession":0,"incorrect_nosession":0},
+        {"date":"08-11  7:36 AM","correct_session":2,"incorrect_session":0,"correct_nosession":0,"incorrect_nosession":0},
+        {"date":"08-24  6:14 AM","correct_session":1,"incorrect_session":1,"correct_nosession":2,"incorrect_nosession":0},
+        {"date":"08-26  8:01 PM","correct_session":0,"incorrect_session":0,"correct_nosession":1,"incorrect_nosession":0}
+    ]
+}
