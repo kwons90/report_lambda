@@ -1,16 +1,23 @@
 ##### import necessary packages
 from fpdf import FPDF
 import json
-import os
+import os, stat
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl # TODO not called, do we need this imported?
 from matplotlib.ticker import MaxNLocator
 import requests
+from pypdf import PdfWriter
 
+# Path Constants
 CURRENT_PATH = os.getcwd()
+TMP = CURRENT_PATH + "/.tmp/"
 
 def main():
+    
+    # Create .tmp folder
+    if not os.path.exists(TMP):
+        os.mkdir(TMP)
                 
     #Read the JSON into class
     with open(os.path.join(CURRENT_PATH, "report.json")) as f:
@@ -22,11 +29,18 @@ def main():
     report.generateCoverPage() 
     report.generateReport()
 
+    # Cleanup tmp folder
+    for file in os.listdir(TMP):
+        os.remove(TMP + file)
+    os.chmod(TMP, stat.S_IWUSR)
+    os.rmdir(TMP)
+
+
 #utility function        
 def getImage(url, title):
     response = requests.get(url)
     if response.status_code == 200:
-        with open(str(title)+".png", "wb") as f:
+        with open(TMP + str(title)+".png", "wb") as f:
             f.write(response.content)
 
 class Report:
@@ -116,22 +130,45 @@ class Report:
         # Add label on top of each bar
         # ax.bar_label(bar1, labels=[f'{e:,.1f}' for e in delay_by_month['ArrDelay']], padding=3, color='black', fontsize=8) 
 
-        plt.savefig("foo.png")
+        plt.savefig(TMP + "foo.png")
+
+    def generateAnswerPages(self, i, img1, img2 = ""):
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font('arial', '', 10)
+
+
+        getImage(img1, i)
+
+        pdf.ln(5)
+        pdf.set_font('arial', 'B', 13)
+        pdf.cell(7)
+        pdf.cell(44, 7, " Question Solved "+str(i+1), 0, 0, "L")
+        if self.session_data.accuracy[0] == 1:
+            pdf.cell(10,7, " - Correct", 0, 1, "L")
+        else:
+            pdf.cell(10,7, " - Incorrect", 0, 0, "L")
+        pdf.image(TMP + str(i)+".png", x=18, y=28, w=150, h=109.489)
+        pdf.ln(60)
+
+        if img2:
+            getImage(img2, i + 1)
+            pdf.set_xy(7, 150)
+            pdf.ln(1)
+            pdf.cell(7)
+            pdf.cell(44, 7, " Question Solved "+str(i+2), 0, 0, "L")
+            if self.session_data.accuracy[1] == 1:
+                pdf.cell(10,7, " - Correct", 0, 1, "L")
+            else:
+                pdf.cell(10,7," - Incorrect", 0, 0, "L")
+            pdf.image(TMP + str(i)+".png", x=18, y=165, w=150, h=109.489)
+
+        pdf.output( TMP + str(i) + ".pdf")
+
+    
 
     def generateReport(self):
 
-#        parent_name = report.parent_name
-#        course = report.course
-#        sessions = report.sessions
-#        progress = report.progress
-#        student_name = report.student_name
-#        report_date = report.report_date
-#        join_date = report.join_date
-#        total_questions = report.total_questions
-#        session_question = report.question_count
-#        imgl= report.session_data["image"].tolist()
-#        session_questions= report.session_questions
-#        session_minutes = report.session_minutes
 
         #initialize the instance of the student
         pdf = FPDF()
@@ -223,8 +260,11 @@ class Report:
         pdf.ln(3)
 
         #add the graph
-        pdf.image('./foo.png', x = 3, y = 145, w = 200, h = 0, type = '', link = '')
+        pdf.image(TMP + "foo.png", x = 3, y = 145, w = 200, h = 0, type = '', link = '')
 
+#        pdf.set_font('arial', '', 10)
+#        pdf.set_xy(0, 270)
+        pdf.output(TMP + "cover_page.pdf")
         
     #     pdf.set_fill_color(162, 162, 162)   
     #     pdf.cell(10)
@@ -247,39 +287,60 @@ class Report:
     #         pdf.cell(50, 7, str(session["problems"]), 1, 1, "C")
     #     pdf.ln(30)
     #     pdf.set_font('arial', '', 8)
-        pdf.set_font('arial', '', 10)
-        pdf.set_xy(0, 270)
-        
-        imgl= self.session_data["image"].tolist()
 
-        for i in range(0,len(imgl)):
-            # Download the image
-            if(i%2 == 1):
-                getImage(imgl[i], i)
-                pdf.set_xy(7, 150)
-                pdf.ln(1)
-                pdf.cell(7)
-                pdf.cell(44, 7, " Question Solved "+str(i+1), 0, 0, "L")
-                if self.session_data.accuracy[i] == 1:
-                    pdf.cell(10,7, " - Correct", 0, 1, "L")
-                else:
-                    pdf.cell(10,7," - Incorrect", 0, 0, "L")
-                pdf.image(str(i)+".png", x=18, y=165, w=150, h=109.489)
-            else:
-                getImage(imgl[i], i)
-                pdf.add_page()
-                pdf.ln(5)
-                pdf.set_font('arial', 'B', 13)
-                pdf.cell(7)
-                pdf.cell(44, 7, " Question Solved "+str(i+1), 0, 0, "L")
-                if self.session_data.accuracy[i] == 1:
-                    pdf.cell(10,7, " - Correct", 0, 1, "L")
-                else:
-                    pdf.cell(10,7, " - Incorrect", 0, 0, "L")
-                pdf.image(str(i)+".png", x=18, y=28, w=150, h=109.489)
-                pdf.ln(60)
+
+        
+
+        # create answer pages
+        imgl= self.session_data["image"].tolist()
+        for i in range(0, len(imgl), 2):
+            # not too elegant, but calls the function with one input if the index is out of range
+#            try:
+#                Report.generateAnswerPages(self, i, imgl[i], imgl[i+1])
+#            except IndexError:
+#                Report.generateAnswerPages(self, i, imgl[i])
+            pass
+
+
+        # merge all pages together
+        merger = PdfWriter()
+
+        merger.append(TMP + "cover_page.pdf")
+
+        for i in range(0, len(imgl), 2):
+            merger.append(TMP + str(i) + ".pdf")
+
+        merger.write("sample_report.pdf")
+        merger.close()
+
+
+#        for i in range(0,len(imgl)):
+#            # Download the image
+#            if(i%2 == 1):
+#                getImage(imgl[i], i)
+#                pdf.set_xy(7, 150)
+#                pdf.ln(1)
+#                pdf.cell(7)
+#                pdf.cell(44, 7, " Question Solved "+str(i+1), 0, 0, "L")
+#                if self.session_data.accuracy[i] == 1:
+#                    pdf.cell(10,7, " - Correct", 0, 1, "L")
+#                else:
+#                    pdf.cell(10,7," - Incorrect", 0, 0, "L")
+#                pdf.image(str(i)+".png", x=18, y=165, w=150, h=109.489)
+#            else:
+#                getImage(imgl[i], i)
+#                pdf.add_page()
+#                pdf.ln(5)
+#                pdf.set_font('arial', 'B', 13)
+#                pdf.cell(7)
+#                pdf.cell(44, 7, " Question Solved "+str(i+1), 0, 0, "L")
+#                if self.session_data.accuracy[i] == 1:
+#                    pdf.cell(10,7, " - Correct", 0, 1, "L")
+#                else:
+#                    pdf.cell(10,7, " - Incorrect", 0, 0, "L")
+#                pdf.image(str(i)+".png", x=18, y=28, w=150, h=109.489)
+#                pdf.ln(60)
             
-        pdf.output("report_test.pdf")
 # end of GenerateReport
 
 # end of Report class
