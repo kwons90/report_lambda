@@ -8,13 +8,18 @@ import matplotlib as mpl # TODO not called, do we need this imported?
 from matplotlib.ticker import MaxNLocator
 import requests
 from pypdf import PdfWriter
-import threading
+from multiprocessing import Process
+
+import time
 
 # Path Constants
 CURRENT_PATH = os.getcwd()
 TMP = CURRENT_PATH + "/.tmp/"
+THREADS = 10
 
 def main():
+    
+    start = time.time()
     
     # Create .tmp folder
     if not os.path.exists(TMP):
@@ -35,6 +40,9 @@ def main():
         os.remove(TMP + file)
     os.chmod(TMP, stat.S_IWUSR)
     os.rmdir(TMP)
+
+    end = time.time()
+    print(f"Execution took {end - start} seconds.")
 
 
 #utility function        
@@ -293,21 +301,21 @@ class Report:
         
 
         # create answer pages
-        threads = list()
+        procs = list()
 
         imgl= self.session_data["image"].tolist()
         for i in range(0, len(imgl), 2):
             # not too elegant, but calls the function with one input if the index is out of range
             try:
-                thread = threading.Thread(target = Report.generateAnswerPages, args = (self, i, imgl[i], imgl[i+1]))
+                proc = Process(target = Report.generateAnswerPages, args = (self, i, imgl[i], imgl[i+1]))
             except IndexError:
-                thread = threading.Thread(target = Report.generateAnswerPages, args = (self, i, imgl[i]))
+                proc = Process(target = Report.generateAnswerPages, args = (self, i, imgl[i]))
             pass
-            threads.append(thread)
-            thread.start()
+            procs.append(proc)
         
-        for thread in threads:
-            thread.join()
+        
+        for proc in procs:
+            proc.join()
 
 
         # merge all pages together
