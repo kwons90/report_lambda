@@ -15,7 +15,6 @@ import time
 # Path Constants
 CURRENT_PATH = os.getcwd()
 TMP = CURRENT_PATH + "/.tmp/"
-THREADS = 10
 
 def main():
     
@@ -312,7 +311,7 @@ class Report:
                 proc = Process(target = Report.generateAnswerPages, args = (self, i, imgl[i]))
             pass
             procs.append(proc)
-        
+            proc.start()
         
         for proc in procs:
             proc.join()
