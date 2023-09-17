@@ -8,6 +8,7 @@ import matplotlib as mpl # TODO not called, do we need this imported?
 from matplotlib.ticker import MaxNLocator
 import requests
 from pypdf import PdfWriter
+import threading
 
 # Path Constants
 CURRENT_PATH = os.getcwd()
@@ -292,14 +293,21 @@ class Report:
         
 
         # create answer pages
+        threads = list()
+
         imgl= self.session_data["image"].tolist()
         for i in range(0, len(imgl), 2):
             # not too elegant, but calls the function with one input if the index is out of range
-#            try:
-#                Report.generateAnswerPages(self, i, imgl[i], imgl[i+1])
-#            except IndexError:
-#                Report.generateAnswerPages(self, i, imgl[i])
+            try:
+                thread = threading.Thread(target = Report.generateAnswerPages, args = (self, i, imgl[i], imgl[i+1]))
+            except IndexError:
+                thread = threading.Thread(target = Report.generateAnswerPages, args = (self, i, imgl[i]))
             pass
+            threads.append(thread)
+            thread.start()
+        
+        for thread in threads:
+            thread.join()
 
 
         # merge all pages together
