@@ -4,7 +4,6 @@ import json
 import os, stat
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib as mpl # TODO not called, do we need this imported?
 from matplotlib.ticker import MaxNLocator
 import requests
 from pypdf import PdfWriter
@@ -15,6 +14,7 @@ import time
 # Path Constants
 CURRENT_PATH = os.getcwd()
 TMP = CURRENT_PATH + "/.tmp/"
+MAX_THREADS = 20
 
 def main():
     
@@ -169,14 +169,12 @@ class Report:
                 pdf.cell(10,7, " - Correct", 0, 1, "L")
             else:
                 pdf.cell(10,7," - Incorrect", 0, 0, "L")
-            pdf.image(TMP + str(i)+".png", x=18, y=165, w=150, h=109.489)
+            #pdf.image(TMP + str(i)+".png", x=18, y=165, w=150, h=109.489)
 
         pdf.output( TMP + str(i) + ".pdf")
 
-    
 
     def generateReport(self):
-
 
         #initialize the instance of the student
         pdf = FPDF()
@@ -270,9 +268,6 @@ class Report:
         #add the graph
         pdf.image(TMP + "foo.png", x = 3, y = 145, w = 200, h = 0, type = '', link = '')
 
-#        pdf.set_font('arial', '', 10)
-#        pdf.set_xy(0, 270)
-        pdf.output(TMP + "cover_page.pdf")
         
     #     pdf.set_fill_color(162, 162, 162)   
     #     pdf.cell(10)
@@ -296,8 +291,11 @@ class Report:
     #     pdf.ln(30)
     #     pdf.set_font('arial', '', 8)
 
+    #    pdf.set_font('arial', '', 10)
+    #    pdf.set_xy(0, 270)
 
-        
+        # write cover page
+        pdf.output(TMP + "cover_page.pdf")
 
         # create answer pages
         procs = list()
@@ -311,11 +309,19 @@ class Report:
                 proc = Process(target = Report.generateAnswerPages, args = (self, i, imgl[i]))
             pass
             procs.append(proc)
-            proc.start()
         
-        for proc in procs:
-            proc.join()
-
+        # start threads - if less than max threads remaining, only call enough to finish the list of processes
+        threadCount = MAX_THREADS
+        for i in range(0, len(procs), MAX_THREADS):
+            if i + MAX_THREADS > len(procs):
+                threadCount = len(procs) - i
+            for j in range(i, i + threadCount):
+                procs[j].start()
+                print(f"process {j} started")
+            for j in range(i, i + threadCount):
+                procs[j].join()
+                print(f"process {j} stoped")
+        
 
         # merge all pages together
         merger = PdfWriter()
@@ -328,37 +334,6 @@ class Report:
         merger.write("sample_report.pdf")
         merger.close()
 
-
-#        for i in range(0,len(imgl)):
-#            # Download the image
-#            if(i%2 == 1):
-#                getImage(imgl[i], i)
-#                pdf.set_xy(7, 150)
-#                pdf.ln(1)
-#                pdf.cell(7)
-#                pdf.cell(44, 7, " Question Solved "+str(i+1), 0, 0, "L")
-#                if self.session_data.accuracy[i] == 1:
-#                    pdf.cell(10,7, " - Correct", 0, 1, "L")
-#                else:
-#                    pdf.cell(10,7," - Incorrect", 0, 0, "L")
-#                pdf.image(str(i)+".png", x=18, y=165, w=150, h=109.489)
-#            else:
-#                getImage(imgl[i], i)
-#                pdf.add_page()
-#                pdf.ln(5)
-#                pdf.set_font('arial', 'B', 13)
-#                pdf.cell(7)
-#                pdf.cell(44, 7, " Question Solved "+str(i+1), 0, 0, "L")
-#                if self.session_data.accuracy[i] == 1:
-#                    pdf.cell(10,7, " - Correct", 0, 1, "L")
-#                else:
-#                    pdf.cell(10,7, " - Incorrect", 0, 0, "L")
-#                pdf.image(str(i)+".png", x=18, y=28, w=150, h=109.489)
-#                pdf.ln(60)
-            
-# end of GenerateReport
-
-# end of Report class
 
 if(__name__=="__main__"):
     main()
