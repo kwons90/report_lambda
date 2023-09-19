@@ -1,7 +1,7 @@
 ##### import necessary packages
 from fpdf import FPDF
 import json
-import os, stat
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
@@ -13,8 +13,9 @@ import time
 
 # Path Constants
 CURRENT_PATH = os.getcwd()
-TMP = CURRENT_PATH + "/.tmp/"
-MAX_THREADS = 20
+TMP = os.path.join(CURRENT_PATH, "/.tmp/")
+
+MAX_THREADS = 20                # Change this to add more or less threads (adding or subtracting could improve performance)
 
 def main():
     
@@ -35,10 +36,10 @@ def main():
     report.generateReport()
 
     # Cleanup tmp folder
-    for file in os.listdir(TMP):
-        os.remove(TMP + file)
-    os.chmod(TMP, stat.S_IWUSR)
-    os.rmdir(TMP)
+#    for file in os.listdir(TMP):
+#        os.remove(TMP + file)
+#    os.chmod(TMP, stat.S_IWUSR)
+#    os.rmdir(TMP)
 
     end = time.time()
     print(f"Execution took {end - start} seconds.")
@@ -169,7 +170,7 @@ class Report:
                 pdf.cell(10,7, " - Correct", 0, 1, "L")
             else:
                 pdf.cell(10,7," - Incorrect", 0, 0, "L")
-            #pdf.image(TMP + str(i)+".png", x=18, y=165, w=150, h=109.489)
+            pdf.image(TMP + str(i)+".png", x=18, y=165, w=150, h=109.489)
 
         pdf.output( TMP + str(i) + ".pdf")
 
@@ -302,7 +303,7 @@ class Report:
 
         imgl= self.session_data["image"].tolist()
         for i in range(0, len(imgl), 2):
-            # not too elegant, but calls the function with one input if the index is out of range
+            # not too elegant, but handles if there is only one image on the last page
             try:
                 proc = Process(target = Report.generateAnswerPages, args = (self, i, imgl[i], imgl[i+1]))
             except IndexError:
@@ -310,7 +311,7 @@ class Report:
             pass
             procs.append(proc)
         
-        # start threads - if less than max threads remaining, only call enough to finish the list of processes
+        # start threads - prevents starting more threads than needed
         threadCount = MAX_THREADS
         for i in range(0, len(procs), MAX_THREADS):
             if i + MAX_THREADS > len(procs):
