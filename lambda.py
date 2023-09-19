@@ -13,7 +13,6 @@ import time
 
 # Path Constants
 CURRENT_PATH = os.getcwd()
-TMP = os.path.join(CURRENT_PATH, "/.tmp/")
 
 MAX_THREADS = 20                # Change this to add more or less threads (adding or subtracting could improve performance)
 
@@ -21,10 +20,6 @@ def main():
     
     start = time.time()
     
-    # Create .tmp folder
-    if not os.path.exists(TMP):
-        os.mkdir(TMP)
-                
     #Read the JSON into class
     with open(os.path.join(CURRENT_PATH, "report.json")) as f:
         report_data = json.load(f)
@@ -35,12 +30,6 @@ def main():
     report.generateCoverPage() 
     report.generateReport()
 
-    # Cleanup tmp folder
-#    for file in os.listdir(TMP):
-#        os.remove(TMP + file)
-#    os.chmod(TMP, stat.S_IWUSR)
-#    os.rmdir(TMP)
-
     end = time.time()
     print(f"Execution took {end - start} seconds.")
 
@@ -49,7 +38,7 @@ def main():
 def getImage(url, title):
     response = requests.get(url)
     if response.status_code == 200:
-        with open(TMP + str(title)+".png", "wb") as f:
+        with open(str(title)+".png", "wb") as f:
             f.write(response.content)
 
 class Report:
@@ -139,13 +128,12 @@ class Report:
         # Add label on top of each bar
         # ax.bar_label(bar1, labels=[f'{e:,.1f}' for e in delay_by_month['ArrDelay']], padding=3, color='black', fontsize=8) 
 
-        plt.savefig(TMP + "foo.png")
+        plt.savefig("foo.png")
 
     def generateAnswerPages(self, i, img1, img2 = ""):
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font('arial', '', 10)
-
 
         getImage(img1, i)
 
@@ -157,7 +145,7 @@ class Report:
             pdf.cell(10,7, " - Correct", 0, 1, "L")
         else:
             pdf.cell(10,7, " - Incorrect", 0, 0, "L")
-        pdf.image(TMP + str(i)+".png", x=18, y=28, w=150, h=109.489)
+        pdf.image(str(i)+".png", x=18, y=28, w=150, h=109.489)
         pdf.ln(60)
 
         if img2:
@@ -170,9 +158,9 @@ class Report:
                 pdf.cell(10,7, " - Correct", 0, 1, "L")
             else:
                 pdf.cell(10,7," - Incorrect", 0, 0, "L")
-            pdf.image(TMP + str(i)+".png", x=18, y=165, w=150, h=109.489)
+            pdf.image(str(i+1)+".png", x=18, y=165, w=150, h=109.489)
 
-        pdf.output( TMP + str(i) + ".pdf")
+        pdf.output(str(i) + ".pdf")
 
 
     def generateReport(self):
@@ -267,7 +255,7 @@ class Report:
         pdf.ln(3)
 
         #add the graph
-        pdf.image(TMP + "foo.png", x = 3, y = 145, w = 200, h = 0, type = '', link = '')
+        pdf.image("foo.png", x = 3, y = 145, w = 200, h = 0, type = '', link = '')
 
         
     #     pdf.set_fill_color(162, 162, 162)   
@@ -296,7 +284,7 @@ class Report:
     #    pdf.set_xy(0, 270)
 
         # write cover page
-        pdf.output(TMP + "cover_page.pdf")
+        pdf.output("cover_page.pdf")
 
         # create answer pages
         procs = list()
@@ -327,10 +315,10 @@ class Report:
         # merge all pages together
         merger = PdfWriter()
 
-        merger.append(TMP + "cover_page.pdf")
+        merger.append("cover_page.pdf")
 
         for i in range(0, len(imgl), 2):
-            merger.append(TMP + str(i) + ".pdf")
+            merger.append(str(i) + ".pdf")
 
         merger.write("sample_report.pdf")
         merger.close()
